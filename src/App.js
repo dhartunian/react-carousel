@@ -216,9 +216,10 @@ class Idora extends Component {
   componentDidMount() {
     window.addEventListener('resize', this.handleResize);
     window.addEventListener('keydown', this.handleKeyDown);
-    window.addEventListener('dragstart', this.handleDragStart)
 
     const thisNode = ReactDOM.findDOMNode(this);
+    thisNode.addEventListener('dragstart', this.handleDragStart)
+
     this.hammer = new Hammer(thisNode);
     this.hammer.on('panstart', this.handleSwipe);
   }
@@ -226,7 +227,7 @@ class Idora extends Component {
   componentWillUnmount() {
     window.removeEventListener('resize', this.handleResize);
     window.removeEventListener('keydown', this.handleKeyDown);
-    window.removeEventListener('dragstart', this.handleDragStart);
+    ReactDOM.findDOMNode(this).removeEventListener('dragstart', this.handleDragStart);
     this.hammer.off('panstart', this.handleSwipe);
   }
 
@@ -239,7 +240,7 @@ class Idora extends Component {
                       peek={this.state.peek}/>
         </div>
         <IdoraNav scrollNext={this.scrollNext} scrollPrev={this.scrollPrev}
-                  disableNext={this.state.leftmost_item === this.state.carousel_items.length - 1}
+                  disableNext={this.state.leftmost_item === (this.state.carousel_items.length || 0) - 1}
                   disablePrev={this.state.leftmost_item === 0} />
         <IdoraDots scrollTo={this.scrollTo}
                    carousel_items={this.state.carousel_items}
