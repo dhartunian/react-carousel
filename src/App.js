@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
+import Hammer from 'hammerjs';
 import './App.css';
 
 class CarouselItem extends Component {
@@ -147,6 +148,7 @@ class Idora extends Component {
     this.scrollTo = this.scrollTo.bind(this);
     this.handleResize = this.handleResize.bind(this);
     this.handleKeyDown = this.handleKeyDown.bind(this);
+    this.handleSwipe = this.handleSwipe.bind(this);
   }
 
   scrollBy(amount) {
@@ -197,14 +199,35 @@ class Idora extends Component {
     }
   }
 
+  handleDragStart() {
+    return false;
+  }
+
+  handleSwipe(ev) {
+    var deltaY = ev.deltaY;
+    var deltaX = ev.deltaX;
+
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+      var scrollAmt = Math.min(Math.round(deltaX / -8), 10);
+      this.scrollBy(scrollAmt);
+    }
+  };
+
   componentDidMount() {
     window.addEventListener('resize', this.handleResize);
     window.addEventListener('keydown', this.handleKeyDown);
+    window.addEventListener('dragstart', this.handleDragStart)
+
+    const thisNode = ReactDOM.findDOMNode(this);
+    this.hammer = new Hammer(thisNode);
+    this.hammer.on('panstart', this.handleSwipe);
   }
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.handleResize);
     window.removeEventListener('keydown', this.handleKeyDown);
+    window.removeEventListener('dragstart', this.handleDragStart);
+    this.hammer.off('panstart', this.handleSwipe);
   }
 
   render() {
